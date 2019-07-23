@@ -9,13 +9,26 @@ Run this code with
 
     > fab run assignment02.py
 """
+from tqdm import tqdm
+from urllib.request import Request, urlopen
 
 from yahoo import read_symbols, YAHOO_HTMLS
 
 
+HEADERS = {
+    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.1.1 Safari/605.1.15',
+    }
+
+
 def scrape_descriptions_sync():
     """Scrape companies descriptions synchronously."""
-    # TODO: Second assignment. Use https://docs.python.org/3/library/urllib.html
+
+    YAHOO_HTMLS.mkdir(parents=True, exist_ok=True)
+
+    for symbol in tqdm(read_symbols()):
+        with urlopen(Request(f'https://finance.yahoo.com/quote/{symbol}/profile?p={symbol}', headers=HEADERS)) as response:
+            with (YAHOO_HTMLS / f'{symbol}.html').open('wb') as f:
+                f.write(response.read())
 
 
 def main():
